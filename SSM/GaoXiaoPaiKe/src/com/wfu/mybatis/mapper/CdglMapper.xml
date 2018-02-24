@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.wfu.mybatis.mapper.CdglMapper">
+   <resultMap type="com.wfu.web.domain.SysMenu" id="menuMap">
+      <id column="MENUID" property="menuId" jdbcType="INTEGER"/>
+      <result column="MENUNAME" property="menuName" jdbcType="VARCHAR"/>
+      <result column="MENUURL" property="menuUrl" jdbcType="VARCHAR"/>
+      <result column="MENULEVEL" property="menuLevel" jdbcType="VARCHAR"/>
+      <result column="MENUFATHER" property="menuFather" jdbcType="INTEGER"/>
+      <result column="MENUSTATE" property="menuState" jdbcType="VARCHAR"/>
+   </resultMap>
+   <!-- 新增菜单 -->
+   <insert id="addMenu" parameterType="com.wfu.web.domain.SysMenu">
+      INSERT INTO SYS_MENU M(M.MENUID,M.MENUNAME,M.MENUURL,M.MENULEVEL,M.MENUFATHER,M.MENUSTATE)
+           VALUES(#{menuId},#{menuName},#{menuUrl},#{menuLevel},#{menuFather},#{menuState})
+   </insert>
+   <!-- 获取一级菜单最大的id号 -->
+   <select id="getFMenuMaxId" resultType="Integer">
+	   SELECT MAX(M.MENUID)
+	     FROM SYS_MENU M
+	    WHERE M.MENULEVEL='1'
+   </select>
+   <!-- 获取二级菜单最大的id号 -->
+   <select id="getSMenuMaxId" resultType="Integer">
+	   SELECT MAX(M.MENUID)
+	     FROM SYS_MENU M
+	    WHERE M.MENULEVEL='2'
+   </select>
+   <!-- 修改菜单 -->
+   <update id="updateMenu" parameterType="com.wfu.web.domain.SysMenu">
+      UPDATE SYS_MENU M
+	     SET M.MENUNAME=#{menuName},M.MENUURL=#{menuUrl},M.MENULEVEL=#{menuLevel},
+	         M.MENUFATHER=#{menuFather},M.MENUSTATE=#{menuState}
+	   WHERE M.MENUID=#{menuId}
+   </update>
+   <!-- 条件查询获取菜单 -->
+   <select id="getAllMenu" parameterType="com.wfu.web.domain.SysMenu" resultMap="menuMap" >
+       SELECT M.MENUID,M.MENUNAME,M.MENUURL,M.MENULEVEL,
+              M.MENUFATHER,M.MENUSTATE
+         FROM SYS_MENU M
+        WHERE 1=1
+        <if test="qmenuName!=null and qmenuName!=''">
+          AND M.MENUNAME LIKE '%'||#{qmenuName,jdbcType=VARCHAR}||'%'
+        </if>
+       ORDER BY M.MENUID
+   </select>
+   <!-- 获取全部一级菜单 -->
+   <select id="getFMenu" resultType="e">
+      SELECT M.MENUID,M.MENUNAME
+	    FROM SYS_MENU M
+	   WHERE M.MENULEVEL='1'
+	     AND M.MENUSTATE='1'
+   </select>
+   <!-- 一级菜单根据主键获取菜单 -->
+   <select id="queryById1" parameterType="obj" resultType="e">
+      SELECT M.MENUID,M.MENUNAME,M.MENUURL,M.MENULEVEL,
+             M.MENUFATHER,M.MENUSTATE
+	    FROM SYS_MENU M
+	   WHERE M.MENUID=#{menuId}
+   </select>
+   <!-- 二级菜单按主键获取菜单,并将上一级菜单主键换成一级菜单名 -->
+   <select id="queryById2" parameterType="obj" resultType="e">
+       SELECT B.MENUID,B.MENUNAME,B.MENUURL,B.MENULEVEL,B.MENUFATHER,
+              B.MENUSTATE,A.MENUNAME MENUFATHERNAME
+	     FROM SYS_MENU A,(
+	                     SELECT M.MENUID,M.MENUNAME,M.MENUURL,M.MENULEVEL,
+	                            M.MENUFATHER,M.MENUSTATE
+	                       FROM SYS_MENU M
+	                      WHERE M.MENUID=#{menuId}
+	                     )B
+	    WHERE A.MENUID=B.MENUFATHER
+   </select>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.wfu.mybatis.mapper.KcglMapper">
+   <!-- 获取专业 -->
+   <select id="getMajorList" parameterType="obj" resultType="e">
+      SELECT M.MID,M.MNAME,M.DEPARTMENT
+	    FROM MAJOR M
+	   WHERE M.DEPARTMENT=#{department}
+   </select>
+   <!-- 获取课程 -->
+   <select id="getCourseList" resultType="e">
+	   SELECT C.COID,C.CONAME,C.CONUM
+	     FROM COURSE C
+	    WHERE C.COSTATE='1'
+   </select>
+   <!-- 根据专业流水号查询专业课程中间表 -->
+   <select id="getMajorCourseByMajorId" parameterType="com.wfu.web.domain.MajorCourse" resultType="e">
+      SELECT MC.MCID,MC.COIDS,MC.MID,MC.GRADE
+	    FROM MAJOR_COURSE MC
+	   WHERE MC.MID=#{mId}
+	     AND MC.GRADE=#{grade}
+   </select>
+   <!-- 根据查询结果,如果该专业流水号没有对应的课程就添加 -->
+   <insert id="addMajorCourse" parameterType="com.wfu.web.domain.MajorCourse">
+	   INSERT INTO MAJOR_COURSE(MCID,MID,COIDS,GRADE)
+	          VALUES(S_MAJORCOURSE.NEXTVAL,#{mId},#{coIds},#{grade})
+   </insert>
+   <!-- 根据查询结果,如果该专业流水号有对应的课程就修改 -->
+   <update id="uodateMajorCourse" parameterType="com.wfu.web.domain.MajorCourse">
+	   UPDATE MAJOR_COURSE MC
+	      SET MC.COIDS=#{coIds}
+	    WHERE MC.MID=#{mId}
+	      AND MC.GRADE=#{grade}
+   </update>
+</mapper>

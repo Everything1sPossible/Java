@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.wfu.mybatis.mapper.LoginMapper">
+
+    <!-- 校验登录 -->
+    <select id="checkLogin" parameterType="com.wfu.web.domain.SysLogin" resultType="e">
+        SELECT L.LOGINID,L.LOGINNAME,L.LOGINUSER,L.LOGINMENU,L.USERNAME,
+               L.PASSWORD,L.TID,L.STUID
+		  FROM SYS_LOGIN L
+		 WHERE L.USERNAME=#{username}
+		   AND L.PASSWORD=#{password}
+		   AND L.LOGINSTATE=#{loginState}
+    </select>
+    
+    <!--批量查询,获取在使用的一级菜单 -->
+    <select id="getFMenu" parameterType="m" resultType="e">
+        SELECT M.MENUID,M.MENUNAME,M.MENUURL
+		  FROM SYS_MENU M
+		 WHERE M.MENUID IN 
+		 <foreach collection="menuIds" open="(" item="id" separator="," close=")">
+		    #{id}
+		 </foreach>
+		   AND M.MENULEVEL='1'
+		   AND M.MENUSTATE='1'
+		ORDER BY M.MENUID
+    </select>
+    <!--根据一级菜单获取在使用的二级菜单 -->
+    <select id="getSMenu" parameterType="obj" resultType="e">
+        SELECT M.MENUID,M.MENUNAME,M.MENUURL
+		  FROM SYS_MENU M
+		 WHERE M.MENUFATHER=#{fatherMenuId} 
+		   AND M.MENULEVEL='2'
+		   AND M.MENUSTATE='1'
+		ORDER BY M.MENUID
+    </select>
+</mapper>

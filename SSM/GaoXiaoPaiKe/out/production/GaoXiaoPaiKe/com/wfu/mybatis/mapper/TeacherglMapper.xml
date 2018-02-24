@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.wfu.mybatis.mapper.TeacherglMapper">
+    <resultMap type="com.wfu.web.domain.Teacher" id="teacherMap">
+       <id column="TID" property="tid" jdbcType="INTEGER"/>
+       <result column="TNAME" property="tname" jdbcType="VARCHAR"/>
+       <result column="TNUMBER" property="tnumber" jdbcType="VARCHAR"/>
+       <result column="COURSE" property="course" jdbcType="VARCHAR"/>
+       <result column="DEPARTMENT" property="department" jdbcType="VARCHAR"/>
+       <result column="ROLE" property="role" jdbcType="VARCHAR"/>
+    </resultMap>
+    <!-- 初始化课程下拉列表 -->
+    <select id="getCourseList" resultType="e">
+	    SELECT C.CONAME,C.CONUM
+		  FROM COURSE C
+		 WHERE C.COSTATE='1'
+		ORDER BY C.COID
+    </select>
+    <!-- 条件查询教师并分页 -->
+    <select id="queryByPage" parameterType="com.wfu.web.domain.Teacher" resultMap="teacherMap">
+	    SELECT T.TID,T.TNAME,T.TNUMBER,T.COURSE,T.DEPARTMENT,T.ROLE
+		  FROM TEACHER T
+		 WHERE 1=1
+        <if test="qtname!=null and qtname!=''">
+          AND T.TNAME LIKE '%'||#{qtname,jdbcType=VARCHAR}||'%'
+        </if>
+        <if test="qtnumber!=null and qtnumber!=''">
+          AND T.TNUMBER=#{qtnumber}
+        </if>
+		ORDER BY T.TNUMBER
+    </select>
+	<!-- 添加教师 -->
+	<insert id="addTeacher" parameterType="com.wfu.web.domain.Teacher">
+	   INSERT INTO TEACHER T(T.TID,T.TNAME,T.TNUMBER,T.COURSE,T.DEPARTMENT,T.ROLE)
+            VALUES(S_TEACHER.NEXTVAL,#{tname},#{tnumber},#{course,jdbcType=VARCHAR},
+                  #{department,jdbcType=VARCHAR},#{role})
+	</insert>
+	<!-- 注册账号 -->
+	<insert id="signupNewLogin" parameterType="com.wfu.web.domain.SysLogin">
+	   INSERT INTO SYS_LOGIN L(L.LOGINID,L.TID,L.STUID,L.LOGINNAME,l.USERNAME,l.PASSWORD,
+                         L.LOGINUSER,L.LOGINMENU,L.LOGINSTATE)
+			      VALUES(S_LOGIN.NEXTVAL,#{tid},#{stuId,jdbcType=INTEGER},#{loginName},#{username},#{password},
+			              #{loginUser},#{loginMenu},#{loginState})
+	</insert>
+	<!-- 删除教师 -->
+	<delete id="deleteTeacher" parameterType="m">
+	  DELETE FROM TEACHER 
+	  <where>
+	    <choose>
+		    <when test="tids!=null and tids.length!=0">
+		      <foreach collection="tids" item="tid">
+		        <if test="tid!=null and tid!='' ">
+		          OR TID=#{tid}
+		        </if>
+		      </foreach>
+		    </when>
+		    <otherwise>
+		      1>2
+		    </otherwise>
+	   </choose>
+	 </where>
+	</delete>
+</mapper>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="com.wfu.mybatis.mapper.XgmmMapper">
+   <!-- 修改密码 -->
+   <update id="updatePwd" parameterType="com.wfu.web.domain.SysLogin">
+      UPDATE SYS_LOGIN L
+         SET L.PASSWORD=#{Newpassword}
+       WHERE L.LOGINID=#{loginId}
+   </update>
+</mapper>
