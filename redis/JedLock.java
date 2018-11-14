@@ -14,7 +14,7 @@ public class JedLock {
     //等待锁的时间
     private static final int RETRY_TIME = 10 * 1000;
     //锁超时的时间
-    private static final int EXPIRE_TIME = 60 * 1000;
+    private static final int EXPIRE_TIME = 6 * 1000;
     private boolean locked;
     private long lockValue;
 
