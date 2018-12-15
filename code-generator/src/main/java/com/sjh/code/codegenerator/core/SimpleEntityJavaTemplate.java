@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * @author sjh
  * @Description: 普通实体类文件生成类
- * @date 2018/12/14 22:57
+ * @date 2018/12/14 22:58
  */
 public class SimpleEntityJavaTemplate extends AbstractFreemarkerTemplate {
 
