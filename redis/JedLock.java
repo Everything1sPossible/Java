@@ -46,6 +46,10 @@ public class JedLock {
 
     public void unlock(Jedis jedis){
         if(locked) {
+            /**
+             * 此处线程不安全，客户端Aget获取到值之后，要进行del操作，但是此时在del前排队一个很耗时的操作，比如keys*，那么有可能锁就自己过期了，
+             * 此时再进行del操作就不安全了，因为有可能会把客户端B获取到的锁del了（客户端B的set也排在客户端A的del前）。
+             */
             String currLockVal = jedis.get(REDIS_LOCK_KEY);
             if(currLockVal!=null && Long.valueOf(currLockVal) == lockValue){
                 jedis.del(REDIS_LOCK_KEY);
